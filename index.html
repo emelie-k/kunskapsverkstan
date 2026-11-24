@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vikingaäventyret</title>
+
+<style>
+
+body{
+font-family:Segoe UI;
+background:#0d1b2a;
+color:white;
+max-width:900px;
+margin:auto;
+padding:20px;
+}
+
+h1,h2{
+text-align:center;
+}
+
+#game{
+background:#1b263b;
+padding:25px;
+border-radius:15px;
+margin-top:20px;
+}
+
+button{
+padding:12px;
+margin:8px;
+width:100%;
+border:none;
+border-radius:8px;
+cursor:pointer;
+font-size:16px;
+}
+
+.answer{
+background:#415a77;
+color:white;
+}
+
+.answer:hover{
+background:#778da9;
+}
+
+.stats{
+display:flex;
+justify-content:space-between;
+margin-bottom:20px;
+font-size:20px;
+}
+
+.progress{
+height:25px;
+background:#333;
+border-radius:15px;
+overflow:hidden;
+margin:20px 0;
+}
+
+.progress-fill{
+height:100%;
+width:0%;
+background:gold;
+}
+
+.badge{
+background:gold;
+color:black;
+padding:10px;
+border-radius:10px;
+margin-top:10px;
+display:inline-block;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>🏰 Vikingaäventyret</h1>
+
+<div class="stats">
+
+<div id="xp">⭐ XP: 0</div>
+
+<div id="lives">❤️❤️❤️</div>
+
+</div>
+
+<div class="progress">
+<div class="progress-fill" id="progressBar"></div>
+</div>
+
+<div id="game">
+
+<h2 id="question"></h2>
+
+<div id="answers"></div>
+
+<p id="feedback"></p>
+
+</div>
+
+<div id="badgeArea"></div>
+
+<script>
+
+const questions = [
+
+{
+level:"Vikingabyn",
+question:"Vad kallades en stor släkt under vikingatiden?",
+answers:["Ätt","Familj","Grupp","Klan"],
+correct:0
+},
+
+{
+level:"Vikingabyn",
+question:"Vilket yrke arbetade med järn?",
+answers:["Smed","Bonde","Jägare","Köpman"],
+correct:0
+},
+
+{
+level:"Vikingabyn",
+question:"Vad kallades en ofri människa?",
+answers:["Jarl","Träl","Hövding","Lagman"],
+correct:1
+},
+
+{
+level:"Gården",
+question:"Vilken gröda odlades?",
+answers:["Korn","Banan","Apelsin","Kakao"],
+correct:0
+},
+
+{
+level:"Gården",
+question:"Hur sparade man mat?",
+answers:["Frysbox","Kylskåp","Saltning","Mikro"],
+correct:2
+},
+
+{
+level:"Tinget",
+question:"Vad var tinget?",
+answers:["Marknad","Domstol","Hamn","Tempel"],
+correct:1
+},
+
+{
+level:"Tinget",
+question:"Vem ledde tinget?",
+answers:["Husfrun","Trälen","Lagmannen","Smeden"],
+correct:2
+},
+
+{
+level:"Gudarna",
+question:"Vem hade hammaren Mjölner?",
+answers:["Freja","Oden","Tor","Loke"],
+correct:2
+},
+
+{
+level:"Gudarna",
+question:"Vilken gud hade Valhall?",
+answers:["Tor","Freja","Loke","Oden"],
+correct:3
+},
+
+{
+level:"Handelsresan",
+question:"Vad reste vikingarna med?",
+answers:["Tåg","Bil","Långskepp","Flygplan"],
+correct:2
+},
+
+{
+level:"Handelsresan",
+question:"Vad kunde vikingarna sälja?",
+answers:["Järn","TV-apparater","Mobiltelefoner","Batterier"],
+correct:0
+}
+
+];
+
+let current=0;
+
+let xp=0;
+
+let lives=3;
+
+function updateStats(){
+
+document.getElementById("xp").innerHTML=
+"⭐ XP: "+xp;
+
+let hearts="";
+
+for(let i=0;i<lives;i++){
+
+hearts+="❤️";
+
+}
+
+document.getElementById("lives").innerHTML=
+hearts;
+
+document.getElementById("progressBar").style.width=
+((current/questions.length)*100)+"%";
+
+}
+
+function loadQuestion(){
+
+if(current>=questions.length){
+
+endGame();
+
+return;
+
+}
+
+const q=questions[current];
+
+document.getElementById("question").innerHTML=
+
+"📍 "+q.level+"<br><br>"+q.question;
+
+let html="";
+
+q.answers.forEach((answer,index)=>{
+
+html+=`
+
+<button class="answer"
+
+onclick="checkAnswer(${index})">
+
+${answer}
+
+</button>
+
+`;
+
+});
+
+document.getElementById("answers").innerHTML=html;
+
+}
+
+function checkAnswer(index){
+
+const q=questions[current];
+
+if(index===q.correct){
+
+xp+=10;
+
+document.getElementById("feedback").innerHTML=
+
+"✅ Rätt svar!";
+
+}
+
+else{
+
+lives--;
+
+document.getElementById("feedback").innerHTML=
+
+"❌ Fel svar";
+
+}
+
+checkBadges();
+
+updateStats();
+
+if(lives===0){
+
+gameOver();
+
+return;
+
+}
+
+setTimeout(()=>{
+
+current++;
+
+loadQuestion();
+
+updateStats();
+
+},1000);
+
+}
+
+function checkBadges(){
+
+let badges="";
+
+if(xp>=20){
+
+badges+="<div class='badge'>🪓 Vikingalärling</div>";
+
+}
+
+if(xp>=50){
+
+badges+="<div class='badge'>⚔ Vikingakrigare</div>";
+
+}
+
+if(xp>=80){
+
+badges+="<div class='badge'>👑 Vikingahövding</div>";
+
+}
+
+document.getElementById("badgeArea").innerHTML=
+
+badges;
+
+}
+
+function gameOver(){
+
+document.getElementById("game").innerHTML=`
+
+<h2>☠ Game Over</h2>
+
+<p>Du förlorade alla liv.</p>
+
+<button onclick="location.reload()">
+
+Försök igen
+
+</button>
+
+`;
+
+}
+
+function endGame(){
+
+document.getElementById("progressBar").style.width="100%";
+
+document.getElementById("game").innerHTML=`
+
+<h2>🏆 Du hittade runstenen!</h2>
+
+<p>XP: ${xp}</p>
+
+<p>Du räddade Birkadal.</p>
+
+<button onclick="location.reload()">
+
+Spela igen
+
+</button>
+
+`;
+
+}
+
+updateStats();
+
+loadQuestion();
+
+</script>
+
+</body>
+</html>
